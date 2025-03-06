@@ -1,5 +1,8 @@
 package com.example.crowns.domain.repository
 
+import com.example.crowns.data.database.entity.KillerSudokuState
+
 interface IKillerSudokuRepository {
-    // TODO: интерфейс репозитория
+    suspend fun saveState(state: KillerSudokuState)
+    suspend fun loadState(): KillerSudokuState?
 }

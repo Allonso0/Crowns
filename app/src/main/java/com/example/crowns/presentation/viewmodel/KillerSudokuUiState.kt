@@ -16,11 +16,8 @@ sealed interface KillerSudokuUiState {
     data class Error(val message: String) : KillerSudokuUiState
 
     data class Win(
-        val score: Int,
-        val errors: Int
+        val score: Int
     ) : KillerSudokuUiState
 
-    data class Lose(
-        val errors: Int
-    ) : KillerSudokuUiState
+    data object Lose : KillerSudokuUiState
 }

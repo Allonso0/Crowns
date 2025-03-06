@@ -5,6 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +18,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -26,13 +30,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.crowns.R
 import com.example.crowns.presentation.viewmodel.StatisticsVM
 
 @Composable
-fun StatisticsScreen(navController: NavController, vm: StatisticsVM = viewModel()) {
+fun StatisticsScreen(navController: NavController) {
+    val statsVM: StatisticsVM = hiltViewModel()
+    val stats by statsVM.stats.collectAsState()
+
     val gradient = Brush.verticalGradient(
         0.0f to colorResource(R.color.secondGradientColor),
         1.0f to Color.White,
@@ -154,19 +161,30 @@ fun StatisticsScreen(navController: NavController, vm: StatisticsVM = viewModel(
             }
 
             item {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Начатых игр (Killer Sudoku)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = stats.startedGames.toString(),
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
                     )
                 }
             }
@@ -226,19 +244,30 @@ fun StatisticsScreen(navController: NavController, vm: StatisticsVM = viewModel(
             }
 
             item {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Побед (Killer Sudoku)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = stats.wins.toString(),
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
                     )
                 }
             }
@@ -289,19 +318,29 @@ fun StatisticsScreen(navController: NavController, vm: StatisticsVM = viewModel(
             }
 
             item {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Лучший счёт (Killer Sudoku)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = stats.bestScore.toString(),
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
                     )
                 }
             }
@@ -352,19 +391,30 @@ fun StatisticsScreen(navController: NavController, vm: StatisticsVM = viewModel(
             }
 
             item {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Лучшее время (Killer Sudoku)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = stats.bestTime.timeFormat(),
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
                     )
                 }
             }
@@ -388,4 +438,11 @@ fun StatisticsScreen(navController: NavController, vm: StatisticsVM = viewModel(
             }
         }
     }
+}
+
+fun Long.timeFormat(): String {
+    val totalSeconds = this / 1000
+    val minutes = totalSeconds / 60
+    val seconds = totalSeconds % 60
+    return "%02d:%02d".format(minutes, seconds)
 }

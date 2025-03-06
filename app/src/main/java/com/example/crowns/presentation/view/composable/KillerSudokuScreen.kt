@@ -32,6 +32,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -45,7 +46,9 @@ import com.example.crowns.R
 import com.example.crowns.presentation.viewmodel.KillerSudokuVM
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -81,15 +84,22 @@ fun KillerSudokuScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
 
-    // Загружаем новую игру при первом открытии экрана.
+    val elapsedTime by vm.elapsedTime.collectAsState()
+    val formattedTime = remember(elapsedTime) { timerFormat(elapsedTime) }
+
     LaunchedEffect(Unit) {
-        vm.loadNewGame(Difficulty.MEDIUM)
+        vm.loadSavedState()
+    }
+
+    DisposableEffect(Unit) {
+        vm.startTimer()
+        onDispose { vm.stopTimer() }
     }
 
     // Обрабатываем состояние UI.
     when (val state = uiState) {
         is KillerSudokuUiState.Loading -> FullScreenLoader()
-        is KillerSudokuUiState.Success -> GameContent(state, vm, navController)
+        is KillerSudokuUiState.Success -> GameContent(state, vm, navController, formattedTime)
         is KillerSudokuUiState.Error -> ErrorScreen(
             message = state.message,
             onRetry = { vm.loadNewGame(Difficulty.MEDIUM) }
@@ -120,7 +130,8 @@ fun KillerSudokuScreen(
 private fun GameContent(
     state: KillerSudokuUiState.Success,
     viewModel: KillerSudokuVM,
-    navController: NavController
+    navController: NavController,
+    timerString: String
 ) {
     // Градиент для фона.
     val gradient = Brush.verticalGradient(
@@ -140,7 +151,8 @@ private fun GameContent(
             actionButtons,
             score,
             bottomBar,
-            errorCount) = createRefs()
+            errorCount,
+            timer) = createRefs()
 
         // Фон.
         Box(modifier = Modifier.background(gradient).fillMaxSize())
@@ -169,6 +181,18 @@ private fun GameContent(
                     centerHorizontallyTo(parent)
                     centerVerticallyTo(upperBar)
                 }
+        )
+
+        // Таймер.
+        Text(
+            text = timerString,
+            modifier = Modifier.constrainAs(timer) {
+                centerHorizontallyTo(parent)
+                top.linkTo(downNumPad.bottom, margin = 16.dp)
+            },
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorResource(R.color.backgroundLight)
         )
 
         // Нижний тулбар.
@@ -209,6 +233,7 @@ private fun GameContent(
                 },
             shape = RoundedCornerShape(12.dp),
             onClick = {
+                viewModel.onExit()
                 navController.popBackStack()
             }) {
             Icon(
@@ -229,7 +254,10 @@ private fun GameContent(
                 },
             shape = RoundedCornerShape(12.dp),
             onClick = {
-                navController.navigate("KillerSudokuRules")
+                viewModel.onExit()
+                navController.navigate("KillerSudokuRules") {
+                    popUpTo("KillerSudoku") { saveState = true }
+                }
             }) {
             Icon(
                 Icons.Filled.Info,
@@ -630,7 +658,7 @@ private fun ClearButton(onClick: () -> Unit) {
         contentColor = colorResource(R.color.backgroundDark)
     ) {
         Icon(
-            painter = painterResource(R.drawable.reload),
+            painter = painterResource(R.drawable.replay),
             contentDescription = "Очистить всё",
             modifier = Modifier.size(30.dp)
         )
@@ -649,9 +677,16 @@ private fun HintButton(onClick: () -> Unit) {
         contentColor = colorResource(R.color.backgroundDark)
     ) {
         Icon(
-            painter = painterResource(R.drawable.lamp),
+            painter = painterResource(R.drawable.idea),
             contentDescription = "Подсказка",
             modifier = Modifier.size(30.dp)
         )
     }
+}
+
+// Функция для форматирования таймера.
+private fun timerFormat(millis: Long): String {
+    val seconds = (millis / 1000) % 60
+    val minutes = (millis / 60000) % 60
+    return "%02d:%02d".format(minutes, seconds)
 }

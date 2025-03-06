@@ -3,16 +3,24 @@ package com.example.crowns.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.crowns.data.database.entity.KillerSudokuState
+import com.example.crowns.data.repository.KillerSudokuStatsRepository
 import com.example.crowns.domain.model.Difficulty
 import com.example.crowns.domain.model.KillerSudokuBoard
+import com.example.crowns.domain.repository.IKillerSudokuRepository
 import com.example.crowns.domain.usecase.GenerateKillerSudokuUC
 import com.example.crowns.domain.usecase.VerifyKillerSudokuUC
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.concurrent.timer
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Класс KillerSudokuVM - это ViewModel для режима Killer Sudoku. Она отвечает
@@ -21,7 +29,9 @@ import javax.inject.Inject
 @HiltViewModel
 class KillerSudokuVM @Inject constructor(
     private val generateUC: GenerateKillerSudokuUC,
-    private val verifyUC: VerifyKillerSudokuUC
+    private val verifyUC: VerifyKillerSudokuUC,
+    private val repository: IKillerSudokuRepository,
+    private val statisticRepository: KillerSudokuStatsRepository
 ) : ViewModel() {
 
     // Состояние UI
@@ -38,11 +48,44 @@ class KillerSudokuVM @Inject constructor(
     // Правильное решение для проверки правильности ввода.
     private var correctSolution: List<List<Int>> = emptyList()
 
-    val finalScore: Int
-        get() = (_uiState.value as? KillerSudokuUiState.Success)?.score ?: 0
+    // Общее кол-во ошибок
+    private var _totalErrors = 0
 
-    val finalErrorCount: Int
-        get() = (_uiState.value as? KillerSudokuUiState.Success)?.errorCount ?: 0
+    // Таймер
+    private var _elapsedTime = MutableStateFlow(0L)
+    val elapsedTime: StateFlow<Long> = _elapsedTime.asStateFlow()
+    private var timerJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            val savedState = repository.loadState()
+            when {
+                savedState == null -> loadNewGame(Difficulty.MEDIUM)
+                savedState.isGameCompleted -> loadNewGame(Difficulty.MEDIUM)
+                else -> restoreState(savedState)
+            }
+        }
+    }
+
+    private fun restoreState(savedState: KillerSudokuState) {
+        correctSolution = savedState.correctSolution
+        _hintCells.addAll(savedState.hintCells)
+        _elapsedTime.value = savedState.elapsedTime
+
+        _uiState.value = KillerSudokuUiState.Success(
+            board = savedState.board,
+            selectedCell = null,
+            errorCount = savedState.errorCount,
+            score = savedState.score
+        )
+        _filledCells.addAll(savedState.board.cells
+            .flatMapIndexed { x, row ->
+                row.mapIndexedNotNull { y, cell ->
+                    if (cell.value != null) x to y else null
+                }
+            }
+        )
+    }
 
     /**
      * Функция loadNewGame отвечает за загрузку новой игры с указанной сложностью.
@@ -53,6 +96,8 @@ class KillerSudokuVM @Inject constructor(
             _uiState.value = KillerSudokuUiState.Loading
             _filledCells.clear()
             _hintCells.clear()
+            resetTimer()
+            incrementStartedGames()
 
             try {
                 // Генерация новой доски и решения.
@@ -65,6 +110,18 @@ class KillerSudokuVM @Inject constructor(
                     selectedCell = null,
                     errorCount = 0,
                     score = 0
+                )
+
+                repository.saveState(
+                    KillerSudokuState(
+                        board = board,
+                        score = 0,
+                        errorCount = 0,
+                        isGameCompleted = false,
+                        correctSolution = solution,
+                        hintCells = _hintCells.toList(),
+                        elapsedTime = elapsedTime.value
+                    )
                 )
             } catch (e: Exception) { // Обрабатываем ошибки генерации.
                 _uiState.value = KillerSudokuUiState.Error(e.message ?: "Unknown error")
@@ -98,8 +155,14 @@ class KillerSudokuVM @Inject constructor(
 
         // Обновление доски и подсчет ошибок
         val newBoard = updateBoardCell(currentState.board, row, col, number)
-        val errorCount = calculateErrorCount(newBoard)
         val isCorrect = number == getCorrectValueForCell(row, col)
+
+        val correctValue = getCorrectValueForCell(row, col)
+        val isError = (number != correctValue) && (correctValue != 0)
+
+        if (isError && !currentState.board.cells[row][col].isError) {
+            _totalErrors++;
+        }
 
         val score = calculateScore(newBoard, row, col, isCorrect, isNewCell)
         val newScore = (currentState.score + score).coerceAtLeast(0)
@@ -112,15 +175,86 @@ class KillerSudokuVM @Inject constructor(
         // Обновляем состояние.
         _uiState.value = currentState.copy(
             board = newBoard,
-            errorCount = errorCount,
+            errorCount = _totalErrors.coerceAtMost(3),
             score = newScore
         )
 
-        // Проверяем условия завершения игры.
-        if (errorCount >= 3) {
-            _uiState.value = KillerSudokuUiState.Lose(errors = errorCount)
-        } else if (isBoardComplete(newBoard)) {
-            _uiState.value = KillerSudokuUiState.Win(score = newScore, errors = errorCount)
+        saveCurrentState()
+        checkGameCompletion(newBoard, score)
+    }
+
+    private fun saveCurrentState() {
+        val state = _uiState.value as? KillerSudokuUiState.Success ?: return
+        viewModelScope.launch {
+            repository.saveState(
+                KillerSudokuState(
+                    board = state.board,
+                    score = state.score,
+                    errorCount = state.errorCount,
+                    isGameCompleted = false,
+                    correctSolution = correctSolution,
+                    hintCells = _hintCells.toList(),
+                    elapsedTime = _elapsedTime.value
+                )
+            )
+        }
+    }
+
+    private fun checkGameCompletion(board: KillerSudokuBoard, score: Int) {
+        when {
+            _totalErrors >= 3 -> handleGameOver()
+            isBoardComplete(board) -> handleVictory(score)
+        }
+    }
+
+    private fun handleGameOver() {
+        viewModelScope.launch {
+            val currentState = _uiState.value as? KillerSudokuUiState.Success ?: return@launch
+            repository.saveState(
+                KillerSudokuState(
+                    board = currentState.board,
+                    score = 0,
+                    errorCount = 0,
+                    isGameCompleted = true,
+                    correctSolution = correctSolution,
+                    hintCells = _hintCells.toList(),
+                    elapsedTime = _elapsedTime.value
+                )
+            )
+            _uiState.value = KillerSudokuUiState.Lose
+        }
+    }
+
+    private fun handleVictory(score: Int) {
+        viewModelScope.launch {
+            val currentState = _uiState.value as? KillerSudokuUiState.Success ?: return@launch
+            val currentScore = currentState.score
+            val currentTime = _elapsedTime.value
+
+            statisticRepository.updateStats {
+                copy(
+                    wins = wins + 1,
+                    bestScore = max(bestScore, currentScore),
+                    bestTime = when {
+                        bestTime == 0L -> currentTime
+                        currentTime < bestTime -> currentTime
+                        else -> bestTime
+                    }
+                )
+            }
+
+            repository.saveState(
+                KillerSudokuState(
+                    board = currentState.board,
+                    score = score,
+                    errorCount = 0,
+                    isGameCompleted = true,
+                    correctSolution = correctSolution,
+                    hintCells = _hintCells.toList(),
+                    elapsedTime = _elapsedTime.value
+                )
+            )
+            _uiState.value = KillerSudokuUiState.Win(score = currentScore)
         }
     }
 
@@ -128,9 +262,7 @@ class KillerSudokuVM @Inject constructor(
      * Функция calculateErrorCount отвечает за подсчет количества ошибок на доске.
      */
     private fun calculateErrorCount(board: KillerSudokuBoard): Int {
-        return if (!verifyUC(board)) {
-            board.cells.flatMap { row -> row.filter { it.isError } }.size
-        } else 0
+        return board.cells.flatMap { row -> row.filter { it.isError } }.size
     }
 
     /**
@@ -249,7 +381,7 @@ class KillerSudokuVM @Inject constructor(
 
         val cell = currentState.board.cells[row][col]
 
-        if (cell.isFixed) return
+        if (cell.isFixed || cell.isHint) return
 
         val newBoard = updateBoardCell(
             board = currentState.board,
@@ -272,7 +404,7 @@ class KillerSudokuVM @Inject constructor(
         val newBoard = currentState.board.copy(
             cells = currentState.board.cells.map { row ->
                 row.map { cell ->
-                    if (cell.isFixed) cell else cell.copy(value = null, isError = false)
+                    if (cell.isFixed || cell.isHint) cell else cell.copy(value = null, isError = false)
                 }
             }
         )
@@ -317,6 +449,8 @@ class KillerSudokuVM @Inject constructor(
         // Обновляем состояние
         _hintCells.add(row to col)
         _uiState.value = currentState.copy(board = newBoard)
+
+        checkGameCompletion(newBoard, currentState.score)
     }
 
     /**
@@ -349,6 +483,47 @@ class KillerSudokuVM @Inject constructor(
         return board.cells.all { row ->
             row.all { cell ->
                 cell.value != null && !cell.isError
+            }
+        }
+    }
+
+    fun onExit() {
+        saveCurrentState()
+    }
+
+    fun loadSavedState() {
+        viewModelScope.launch {
+            val savedState = repository.loadState()
+            if (savedState != null && !savedState.isGameCompleted) {
+                restoreState(savedState)
+            }
+        }
+    }
+
+    fun startTimer() {
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (true) {
+                delay(1000)
+                _elapsedTime.value += 1000
+                saveCurrentState()
+            }
+        }
+    }
+
+    fun stopTimer() {
+        timerJob?.cancel()
+        timerJob = null
+    }
+
+    fun resetTimer() {
+        _elapsedTime.value = 0L
+    }
+
+    fun incrementStartedGames() {
+        viewModelScope.launch {
+            statisticRepository.updateStats {
+                copy(startedGames = startedGames + 1)
             }
         }
     }
