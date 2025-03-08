@@ -7,7 +7,7 @@ import com.example.crowns.domain.model.KillerSudokuCell
 class SudokuGenerator {
     /**
      * Константы для настройки генерации:
-     * 1. MAX_CELLS_IN_CAGE - максимальный размер клетки. (временно, TODO: будет меняться от сложности ).
+     * 1. MAX_CELLS_IN_CAGE - максимальный размер клетки.
      * 2. EMPTY_CELLS_EASY - количество пустых ячеек для лёгкой сложности.
      * 3. EMPTY_CELLS_MEDIUM - количество пустых ячеек для средней сложности.
      * 4. EMPTY_CELLS_HARD - количество пустых ячеек для тяжелой сложности.

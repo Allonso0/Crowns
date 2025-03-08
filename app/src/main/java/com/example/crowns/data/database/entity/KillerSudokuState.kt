@@ -4,6 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.crowns.domain.model.KillerSudokuBoard
 
+/**
+ * Data-класс, представляющий состояние игрового поля Killer Sudoku.
+ */
 @Entity(tableName = "killer_sudoku_states")
 data class KillerSudokuState(
     @PrimaryKey val id: Int = 1,

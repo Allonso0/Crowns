@@ -76,14 +76,17 @@ fun NavigationFunc() {
         }
 
         composable(
-            route = "WinScreenKS?score={score}",
+            route = "WinScreenKS?score={score}&time={time}",
             arguments = listOf(
                 navArgument("score") { type = NavType.IntType },
+                navArgument("time") { type = NavType.LongType }
             )
         ) { backStackEntry ->
             val score = backStackEntry.arguments?.getInt("score") ?: 0
+            val time = backStackEntry.arguments?.getLong("time") ?: 0L
             KillerSudokuWinScreen(
                 score = score,
+                time = time,
                 onMenu = { navController.popBackStack("MainMenu", inclusive = false) }
             )
         }

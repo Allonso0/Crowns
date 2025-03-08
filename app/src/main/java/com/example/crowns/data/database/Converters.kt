@@ -5,6 +5,8 @@ import com.example.crowns.domain.model.KillerSudokuBoard
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
+// Конвертеры для библиотеки Room для преобразования
+// сложных объектов в строки (и обратно).
 class Converters {
     private val gson = Gson()
 

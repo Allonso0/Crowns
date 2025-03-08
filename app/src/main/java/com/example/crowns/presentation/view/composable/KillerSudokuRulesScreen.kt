@@ -32,12 +32,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.crowns.R
-import com.example.crowns.presentation.viewmodel.KillerSudokuRulesVM
 
 @Composable
-fun KillerSudokuRulesScreen(navController: NavController, vm: KillerSudokuRulesVM = viewModel()) {
-    val context = LocalContext.current
-
+fun KillerSudokuRulesScreen(navController: NavController) {
     val gradient = Brush.verticalGradient(
         0.0f to colorResource(R.color.secondGradientColor),
         1.0f to Color.White,
@@ -48,7 +45,6 @@ fun KillerSudokuRulesScreen(navController: NavController, vm: KillerSudokuRulesV
     ConstraintLayout(Modifier.fillMaxSize()) {
         val (
             toolbar,
-            mainText,
             button,
             window,
             image

@@ -50,6 +50,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
@@ -66,6 +67,8 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.crowns.data.database.entity.KillerSudokuSettings
 import com.example.crowns.domain.model.Difficulty
 import com.example.crowns.domain.model.KillerSudokuBoard
 import com.example.crowns.domain.model.KillerSudokuCell
@@ -76,13 +79,13 @@ import com.example.crowns.presentation.viewmodel.KillerSudokuUiState
  * - Экран игры
  * - Экран загрузки или экран ошибки в зависимости от состояния.
  */
-// TODO: передавать в loadNewGame не среднюю сложность, а ту, что в настройках.
 @Composable
 fun KillerSudokuScreen(
     navController: NavController,
     vm: KillerSudokuVM = hiltViewModel()
 ) {
     val uiState by vm.uiState.collectAsState()
+    val settings by vm.settings.collectAsState()
 
     val elapsedTime by vm.elapsedTime.collectAsState()
     val formattedTime = remember(elapsedTime) { timerFormat(elapsedTime) }
@@ -99,13 +102,13 @@ fun KillerSudokuScreen(
     // Обрабатываем состояние UI.
     when (val state = uiState) {
         is KillerSudokuUiState.Loading -> FullScreenLoader()
-        is KillerSudokuUiState.Success -> GameContent(state, vm, navController, formattedTime)
+        is KillerSudokuUiState.Success -> GameContent(state, vm, navController, formattedTime, settings ?: KillerSudokuSettings())
         is KillerSudokuUiState.Error -> ErrorScreen(
             message = state.message,
-            onRetry = { vm.loadNewGame(Difficulty.MEDIUM) }
+            onRetry = { vm.loadNewGame() }
         )
         is KillerSudokuUiState.Win -> {
-            navController.navigate("WinScreenKS?score=${state.score}")
+            navController.navigate("WinScreenKS?score=${state.score}&time=${state.elapsedTime}")
             navController.popBackStack("KillerSudoku", inclusive = true)
         }
         is KillerSudokuUiState.Lose -> {
@@ -124,14 +127,13 @@ fun KillerSudokuScreen(
  * - Игровое поле
  * - Цифровую клавиатуру
  */
-// TODO: добавить кнопки "стереть", "подсказка", "заново".
-// TODO: добавить таймер, обновляемый счёт.
 @Composable
 private fun GameContent(
     state: KillerSudokuUiState.Success,
     viewModel: KillerSudokuVM,
     navController: NavController,
-    timerString: String
+    timerString: String,
+    settings: KillerSudokuSettings
 ) {
     // Градиент для фона.
     val gradient = Brush.verticalGradient(
@@ -183,43 +185,51 @@ private fun GameContent(
                 }
         )
 
-        // Таймер.
-        Text(
-            text = timerString,
-            modifier = Modifier.constrainAs(timer) {
-                centerHorizontallyTo(parent)
-                top.linkTo(downNumPad.bottom, margin = 16.dp)
-            },
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.backgroundLight)
-        )
+        settings.let { safeSettings ->
+            if (safeSettings.showTimer) {
+                Text(
+                    text = timerString,
+                    modifier = Modifier
+                        .constrainAs(timer) {
+                            centerHorizontallyTo(parent)
+                            top.linkTo(downNumPad.bottom, margin = 16.dp)
+                        },
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.backgroundLight)
+                )
+            }
+        }
 
-        // Нижний тулбар.
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .shadow(elevation = 8.dp, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
-                .background(color = Color.White)
-                .constrainAs(bottomBar) {
-                    centerHorizontallyTo(parent)
-                    bottom.linkTo(parent.bottom)
-                }
-        )
+        // Лимит ошибок (если включен в настройках)
+        settings.let { safeSettings ->
+            if (safeSettings.errorLimitEnabled) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(80.dp)
+                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                        .background(color = Color.White)
+                        .constrainAs(bottomBar) {
+                            centerHorizontallyTo(parent)
+                            bottom.linkTo(parent.bottom)
+                        }
+                )
 
-        // Отображение текущего количества ошибок.
-        Text(
-            text = "Ошибки: ${state.errorCount}/3",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.backgroundDark),
-            modifier = Modifier
-                .constrainAs(errorCount) {
-                    centerHorizontallyTo(parent)
-                    centerVerticallyTo(bottomBar)
-                }
-        )
+                // Отображение текущего количества ошибок
+                Text(
+                    text = "Ошибки: ${state.errorCount}/3",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.backgroundDark),
+                    modifier = Modifier
+                        .constrainAs(errorCount) {
+                            centerHorizontallyTo(parent)
+                            centerVerticallyTo(bottomBar)
+                        }
+                )
+            }
+        }
 
         // Кнопка для вовзращения в главное меню.
         FloatingActionButton(
@@ -282,7 +292,9 @@ private fun GameContent(
             SudokuField(
                 board = state.board,
                 selectedCell = state.selectedCell,
-                onCellClick = viewModel::onCellSelected
+                onCellClick = viewModel::onCellSelected,
+                viewModel = viewModel,
+                settings = settings
             )
         }
 
@@ -351,11 +363,14 @@ private fun GameContent(
 private fun SudokuField(
     board: KillerSudokuBoard,
     selectedCell: Pair<Int, Int>?,
-    onCellClick: (Int, Int) -> Unit
+    onCellClick: (Int, Int) -> Unit,
+    viewModel: KillerSudokuVM,
+    settings: KillerSudokuSettings
 ) {
     // Настройки стилей
     val cageBorderColor = Color.Black
     val highlightColor = Color.Blue.copy(alpha = 0.1f)
+    val selectedValue by viewModel.selectedCellValue.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Canvas(modifier = Modifier
@@ -393,7 +408,7 @@ private fun SudokuField(
             }
 
             // Отрисовка значений ячеек.
-            drawCellValues(board, cellSize)
+            drawCellValues(board, cellSize, selectedValue, settings)
         }
     }
 }
@@ -500,7 +515,12 @@ private fun DrawScope.drawCage(
 /**
  * Функция drawCellValues отрисовывает цифры в ячейках.
  */
-private fun DrawScope.drawCellValues(board: KillerSudokuBoard, cellSize: Float) {
+private fun DrawScope.drawCellValues(
+    board: KillerSudokuBoard,
+    cellSize: Float,
+    selectedValue: Int?,
+    settings: KillerSudokuSettings
+) {
     val fixedPaint = Paint().apply {
         textSize = 16.sp.toPx()
         color = android.graphics.Color.BLACK
@@ -530,9 +550,22 @@ private fun DrawScope.drawCellValues(board: KillerSudokuBoard, cellSize: Float) 
             cell.value?.let { value ->
                 val paint = when {
                     cell.isFixed -> fixedPaint
-                    cell.isError -> errorPaint
+                    (cell.isError && settings.highlightErrors) -> errorPaint
                     cell.isHint -> hintPaint
                     else -> correctPaint
+                }
+
+                // Рисуем фон для подсвеченных ячеек, если
+                // включена соответствующая опция.
+                if (settings.highlightSameNumbers) {
+                    val isHighlighted = (value == selectedValue) && (selectedValue != null)
+                    if (isHighlighted) {
+                        drawRect(
+                            color = Color.Blue.copy(alpha = 0.2f),
+                            topLeft = Offset(y * cellSize, x * cellSize),
+                            size = Size(cellSize, cellSize)
+                        )
+                    }
                 }
 
                 drawContext.canvas.nativeCanvas.drawText(

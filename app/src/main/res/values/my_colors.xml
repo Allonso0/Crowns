@@ -3,4 +3,5 @@
     <color name="backgroundLight">#D8DCFF</color>
     <color name="backgroundDark">#626FE5</color>
     <color name="secondGradientColor">#AEB6FF</color>
+    <color name="highlight_background">#E3F2FD</color>
 </resources>

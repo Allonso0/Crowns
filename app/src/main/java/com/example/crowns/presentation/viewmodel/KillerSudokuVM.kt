@@ -1,9 +1,14 @@
 package com.example.crowns.presentation.viewmodel
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.crowns.CrownsApplication
+import com.example.crowns.R
+import com.example.crowns.data.database.entity.KillerSudokuSettings
 import com.example.crowns.data.database.entity.KillerSudokuState
+import com.example.crowns.data.repository.KillerSudokuSettingsRepository
 import com.example.crowns.data.repository.KillerSudokuStatsRepository
 import com.example.crowns.domain.model.Difficulty
 import com.example.crowns.domain.model.KillerSudokuBoard
@@ -18,9 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.concurrent.timer
 import kotlin.math.max
-import kotlin.math.min
 
 /**
  * Класс KillerSudokuVM - это ViewModel для режима Killer Sudoku. Она отвечает
@@ -31,7 +34,9 @@ class KillerSudokuVM @Inject constructor(
     private val generateUC: GenerateKillerSudokuUC,
     private val verifyUC: VerifyKillerSudokuUC,
     private val repository: IKillerSudokuRepository,
-    private val statisticRepository: KillerSudokuStatsRepository
+    private val statisticRepository: KillerSudokuStatsRepository,
+    private val settingsRepository: KillerSudokuSettingsRepository,
+    private val application: Application
 ) : ViewModel() {
 
     // Состояние UI
@@ -56,13 +61,35 @@ class KillerSudokuVM @Inject constructor(
     val elapsedTime: StateFlow<Long> = _elapsedTime.asStateFlow()
     private var timerJob: Job? = null
 
+    // Хранение значения выбранной ячейки
+    private val _selectedCellValue = MutableStateFlow<Int?>(null)
+    val selectedCellValue: StateFlow<Int?> = _selectedCellValue.asStateFlow()
+
+    // Состояние настроек режима.
+    private val _settings = MutableStateFlow<KillerSudokuSettings?>(null)
+    val settings: StateFlow<KillerSudokuSettings?> = _settings.asStateFlow()
+
+    // SoundManager для воспроизведения звуков.
+    private val soundManager by lazy {
+        (application as CrownsApplication).soundManager
+    }
+
     init {
+        loadSettings()
         viewModelScope.launch {
             val savedState = repository.loadState()
             when {
-                savedState == null -> loadNewGame(Difficulty.MEDIUM)
-                savedState.isGameCompleted -> loadNewGame(Difficulty.MEDIUM)
+                savedState == null -> loadNewGame()
+                savedState.isGameCompleted -> loadNewGame()
                 else -> restoreState(savedState)
+            }
+        }
+    }
+
+    private fun loadSettings() {
+        viewModelScope.launch {
+            settingsRepository.getSettings().collect {
+                _settings.value = it
             }
         }
     }
@@ -89,9 +116,8 @@ class KillerSudokuVM @Inject constructor(
 
     /**
      * Функция loadNewGame отвечает за загрузку новой игры с указанной сложностью.
-     * @param difficulty Уровень сложности.
      */
-    fun loadNewGame(difficulty: Difficulty) {
+    fun loadNewGame() {
         viewModelScope.launch {
             _uiState.value = KillerSudokuUiState.Loading
             _filledCells.clear()
@@ -101,6 +127,7 @@ class KillerSudokuVM @Inject constructor(
 
             try {
                 // Генерация новой доски и решения.
+                val difficulty = settings.value?.difficulty ?: Difficulty.MEDIUM
                 val (board, solution) = generateUC(difficulty)
                 correctSolution = solution
 
@@ -137,6 +164,10 @@ class KillerSudokuVM @Inject constructor(
     fun onCellSelected(row: Int, col: Int) {
         val currentState = _uiState.value as? KillerSudokuUiState.Success ?: return
         _uiState.value = currentState.copy(selectedCell = row to col)
+
+        // Сохраняем значение выбранной ячейки.
+        val cell = currentState.board.cells[row][col]
+        _selectedCellValue.value = cell.value
     }
 
     /**
@@ -144,6 +175,10 @@ class KillerSudokuVM @Inject constructor(
      * @param number Введенное число.
      */
     fun onNumberInput(number: Int) {
+        if (settings.value?.soundEnabled == true) {
+            soundManager.playSound(R.raw.place)
+        }
+
         val currentState = _uiState.value as? KillerSudokuUiState.Success ?: return
         val (row, col) = currentState.selectedCell ?: return
 
@@ -201,9 +236,11 @@ class KillerSudokuVM @Inject constructor(
     }
 
     private fun checkGameCompletion(board: KillerSudokuBoard, score: Int) {
-        when {
-            _totalErrors >= 3 -> handleGameOver()
-            isBoardComplete(board) -> handleVictory(score)
+        val currentSettings = _settings.value
+        if (currentSettings?.errorLimitEnabled == true && _totalErrors >= 3) {
+            handleGameOver()
+        } else if (isBoardComplete(board)) {
+            handleVictory(score)
         }
     }
 
@@ -254,7 +291,10 @@ class KillerSudokuVM @Inject constructor(
                     elapsedTime = _elapsedTime.value
                 )
             )
-            _uiState.value = KillerSudokuUiState.Win(score = currentScore)
+            _uiState.value = KillerSudokuUiState.Win(
+                score = currentScore,
+                elapsedTime = _elapsedTime.value
+            )
         }
     }
 
@@ -376,6 +416,13 @@ class KillerSudokuVM @Inject constructor(
      * Функция onEraseClick обрабатывает нажатие игрока на кнопку ластика.
      */
     fun onEraseClick() {
+        viewModelScope.launch {
+            if (settings.value?.soundEnabled == true) {
+                soundManager.playSound(R.raw.erase)
+            }
+        }
+
+
         val currentState = _uiState.value as? KillerSudokuUiState.Success ?: return
         val (row, col) = currentState.selectedCell ?: return
 
@@ -390,6 +437,7 @@ class KillerSudokuVM @Inject constructor(
             number = null
         )
 
+        _selectedCellValue.value = null
         _uiState.value = currentState.copy(
             board = newBoard
         )
@@ -399,6 +447,10 @@ class KillerSudokuVM @Inject constructor(
      * Функция onClearClick обрабатывает нажатие игрока на кнопку "заново".
      */
     fun onClearClick() {
+        if (settings.value?.soundEnabled == true) {
+            soundManager.playSound(R.raw.replay)
+        }
+
         val currentState = _uiState.value as? KillerSudokuUiState.Success ?: return
 
         val newBoard = currentState.board.copy(
@@ -420,6 +472,10 @@ class KillerSudokuVM @Inject constructor(
      * Функция onHintClick обрабатывает нажатие игрока на кнопку подсказки.
      */
     fun onHintClick() {
+        if (settings.value?.soundEnabled == true) {
+            soundManager.playSound(R.raw.hint)
+        }
+
         val currentState = _uiState.value as? KillerSudokuUiState.Success ?: return
 
         // Ищем все пустые клетки, доступные для подсказки.

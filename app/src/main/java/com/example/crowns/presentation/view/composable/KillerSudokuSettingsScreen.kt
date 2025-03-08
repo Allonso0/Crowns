@@ -2,6 +2,7 @@ package com.example.crowns.presentation.view.composable
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -10,10 +11,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -27,17 +32,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.crowns.R
+import com.example.crowns.data.database.entity.KillerSudokuSettings
+import com.example.crowns.domain.model.Difficulty
+import com.example.crowns.presentation.viewmodel.KillerSudokuSettingsVM
 
 @Composable
-fun KillerSudokuSettingsScreen(navController: NavController) {
+fun KillerSudokuSettingsScreen(
+    navController: NavController,
+    vm: KillerSudokuSettingsVM = hiltViewModel()
+) {
     val gradient = Brush.verticalGradient(
         0.0f to colorResource(R.color.secondGradientColor),
         1.0f to Color.White,
         startY = 0.0f,
         endY = 5000.0f
     )
+
+    val settings by vm.settings.collectAsState()
+    val safeSettings = settings ?: KillerSudokuSettings() // Защита от null.
 
     ConstraintLayout(Modifier.fillMaxSize()) {
         val (
@@ -48,34 +63,26 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
             box3,
             box4,
             box5,
-            box6,
             switch1,
             switch2,
             switch3,
             switch4,
             switch5,
-            switch6,
         ) = createRefs()
 
         val (
             explain1,
             explain2,
             explain3,
-            explain4,
             textVolume,
             textTimer,
             innerLine
         ) = createRefs()
 
-        val checkedState1 = remember { mutableStateOf(false) }
-        val checkedState2 = remember { mutableStateOf(false) }
-        val checkedState3 = remember { mutableStateOf(false) }
-        val checkedState4 = remember { mutableStateOf(false) }
-        val checkedState5 = remember { mutableStateOf(false) }
-        val checkedState6 = remember { mutableStateOf(false) }
-
+        // Фон.
         Box(modifier = Modifier.background(gradient).fillMaxSize())
 
+        // Заголовок экрана.
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -96,6 +103,7 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
             )
         }
 
+        // Кнопка "Назад".
         Button(
             colors = ButtonDefaults.buttonColors(
                 contentColor = Color.White,
@@ -121,6 +129,7 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
             )
         }
 
+        // Настройка сложности.
         Box(
             modifier = Modifier
                 .width(320.dp)
@@ -131,15 +140,38 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
                     centerHorizontallyTo(parent)
                     top.linkTo(title.bottom, margin = 20.dp)
                 },
-            contentAlignment = Alignment.TopCenter
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Сложность игры",
-                color = colorResource(R.color.backgroundDark),
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                modifier = Modifier.padding(top = 10.dp)
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    //text = "Сложность: ${settings.difficulty.name}",
+                    text = when(safeSettings.difficulty) {
+                        Difficulty.EASY -> "Сложность: легко"
+                        Difficulty.MEDIUM -> "Сложность: средне"
+                        Difficulty.HARD -> "Сложность: тяжело"
+                    },
+                    color = colorResource(R.color.backgroundDark),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+
+                Slider(
+                    value = safeSettings.difficulty.ordinal.toFloat(),
+                    valueRange = 0f..2f,
+                    steps = 1,
+                    onValueChange = { vm.setDifficulty(Difficulty.entries[it.toInt()]) },
+                    colors = SliderDefaults.colors(
+                        thumbColor = colorResource(R.color.backgroundDark),
+                        activeTrackColor = colorResource(R.color.backgroundDark),
+                        inactiveTrackColor = colorResource(R.color.backgroundLight),
+                        inactiveTickColor = colorResource(R.color.backgroundLight),
+                        activeTickColor = colorResource(R.color.backgroundDark)
+                    ),
+                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                )
+            }
         }
 
         Box(
@@ -194,9 +226,9 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
         }
 
         Switch(
-            checked = checkedState1.value,
+            checked = safeSettings.soundEnabled,
             onCheckedChange = {
-                checkedState1.value = it
+                vm.setSoundEnabled(it)
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
@@ -212,9 +244,9 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
         )
 
         Switch(
-            checked = checkedState2.value,
+            checked = safeSettings.showTimer,
             onCheckedChange = {
-                checkedState2.value = it
+                vm.setTimerEnabled(it)
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
@@ -268,9 +300,9 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
         }
 
         Switch(
-            checked = checkedState3.value,
+            checked = safeSettings.errorLimitEnabled,
             onCheckedChange = {
-                checkedState3.value = it
+                vm.setErrorLimitEnabled(it)
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
@@ -324,9 +356,9 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
         }
 
         Switch(
-            checked = checkedState4.value,
+            checked = safeSettings.highlightErrors,
             onCheckedChange = {
-                checkedState4.value = it
+                vm.setHighlightErrors(it)
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
@@ -380,9 +412,9 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
         }
 
         Switch(
-            checked = checkedState5.value,
+            checked = safeSettings.highlightSameNumbers,
             onCheckedChange = {
-                checkedState5.value = it
+                vm.setHighlightSameNumbers(it)
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
@@ -394,62 +426,6 @@ fun KillerSudokuSettingsScreen(navController: NavController) {
             modifier = Modifier.constrainAs(switch5) {
                 centerVerticallyTo(box5)
                 absoluteRight.linkTo(box5.absoluteRight, margin = 15.dp)
-            }
-        )
-
-        Box(
-            modifier = Modifier
-                .width(320.dp)
-                .height(45.dp)
-                .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
-                .background(color = Color.White)
-                .constrainAs(box6) {
-                    centerHorizontallyTo(parent)
-                    top.linkTo(explain3.bottom, margin = 20.dp)
-                },
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Text(
-                text = "Выделять повторы",
-                color = colorResource(R.color.backgroundDark),
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                modifier = Modifier.padding(start = 15.dp)
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .width(290.dp)
-                .constrainAs(explain4) {
-                    absoluteLeft.linkTo(box6.absoluteLeft, margin = 15.dp)
-                    top.linkTo(box6.bottom, margin = 5.dp)
-                }
-        ) {
-            Text(
-                text = "Выделять повторяющиеся цифры в строках, столбцах и блоках",
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-                modifier = Modifier.alpha(0.48f)
-            )
-        }
-
-        Switch(
-            checked = checkedState6.value,
-            onCheckedChange = {
-                checkedState6.value = it
-            },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = colorResource(R.color.backgroundDark),
-                uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = Color.LightGray,
-                uncheckedBorderColor = Color.LightGray
-            ),
-            modifier = Modifier.constrainAs(switch6) {
-                centerVerticallyTo(box6)
-                absoluteRight.linkTo(box6.absoluteRight, margin = 15.dp)
             }
         )
     }
