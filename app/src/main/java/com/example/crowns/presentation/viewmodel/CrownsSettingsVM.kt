@@ -1,35 +1,50 @@
 package com.example.crowns.presentation.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.crowns.data.database.entity.CrownsSettings
+import com.example.crowns.data.database.entity.KillerSudokuSettings
+import com.example.crowns.data.repository.CrownsSettingsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CrownsSettingsVM : ViewModel() {
-    var sliderPosition by mutableFloatStateOf(5f)
+@HiltViewModel
+class CrownsSettingsVM @Inject constructor(
+    private val repository: CrownsSettingsRepository
+) : ViewModel() {
+    // Создаем поток настроек с дефолтным значением.
+    val settings: StateFlow<CrownsSettings> = repository.getSettings()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000), // Состояние сохраняется 5 сек после отписки.
+            initialValue = CrownsSettings() // Передаем дефолтные настройки.
+        )
 
-    var checkedState1 by mutableStateOf(false)
-    var checkedState2 by mutableStateOf(false)
-    var checkedState3 by mutableStateOf(false)
-
-    fun getSliderPos() : Float {
-        return sliderPosition
+    fun setBoardSize(size: Int) {
+        viewModelScope.launch {
+            repository.updateSettings { it.copy(boardSize = size) }
+        }
     }
 
-    fun changeSliderPos(value: Float) {
-        sliderPosition = value
+    fun setTimerEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.updateSettings { it.copy(showTimer = enabled) }
+        }
     }
 
-    fun changeState1(value: Boolean) {
-        checkedState1 = value
+    fun setAutoCrossEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.updateSettings { it.copy(autoCrossEnabled = enabled) }
+        }
     }
 
-    fun changeState2(value: Boolean) {
-        checkedState2 = value
-    }
-
-    fun changeState3(value: Boolean) {
-        checkedState3 = value
+    fun setSoundEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            repository.updateSettings { it.copy(soundEnabled = enabled) }
+        }
     }
 }

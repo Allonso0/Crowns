@@ -31,10 +31,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.crowns.R
-import com.example.crowns.presentation.viewmodel.CrownsRulesVM
 
 @Composable
-fun CrownsRulesScreen(navController: NavController, vm: CrownsRulesVM = viewModel()) {
+fun CrownsRulesScreen(navController: NavController) {
     val gradient = Brush.verticalGradient(
         0.0f to colorResource(R.color.secondGradientColor),
         1.0f to Color.White,
@@ -86,11 +85,9 @@ fun CrownsRulesScreen(navController: NavController, vm: CrownsRulesVM = viewMode
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "1. Ваша задача расставить короны так, чтобы в каждой строке, в каждом столбце и цветовом регионе было по одной фигуре.\n" +
+                text = "1. Ваша задача расставить короны так, чтобы в каждой строке, в каждом столбце, на каждой диагонали и в каждом цветовом регионе было по одной фигуре.\n" +
                         "\n" +
-                        "2. Нажмите один раз, чтобы установить крестик в ячейку и дважды, чтобы установить в ячейку корону. Используйте крестики, чтобы обозначить ячейки, куда нельзя поставить корону.\n" +
-                        "\n" +
-                        "3. Две короны не могут касаться друг друга по диагонали.",
+                        "2. Нажмите один раз, чтобы установить крестик в ячейку и дважды, чтобы установить в ячейку корону. Используйте крестики, чтобы обозначить ячейки, куда нельзя поставить корону.\n",
                 color = colorResource(R.color.backgroundDark),
                 fontWeight = FontWeight.Bold,
                 fontSize = 15.sp,

@@ -1,6 +1,7 @@
 package com.example.crowns.data.database
 
 import androidx.room.TypeConverter
+import com.example.crowns.domain.model.CellState
 import com.example.crowns.domain.model.KillerSudokuBoard
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -41,8 +42,33 @@ class Converters {
     }
 
     @TypeConverter
-    fun longToElapsedTime(value: Long?): Long = value ?: 0L
+    fun cellStateListToString(list: List<List<CellState>>): String {
+        return gson.toJson(list)
+    }
 
     @TypeConverter
-    fun elapsedTimeToLong(value: Long): Long = value
+    fun stringToCellStateList(json: String): List<List<CellState>> {
+        return gson.fromJson(json, object: TypeToken<List<List<CellState>>>() {}.type)
+    }
+
+    @TypeConverter
+    fun regionsMapToString(regions: Map<Int, List<Pair<Int, Int>>>): String {
+        val serialized = regions.mapValues { (_, cells) ->
+            cells.map { listOf(it.first, it.second) }
+        }
+        return gson.toJson(serialized)
+    }
+
+    @TypeConverter
+    fun stringToRegionMap(json: String): Map<Int, List<Pair<Int, Int>>> {
+        val type = object : TypeToken<Map<Int, List<List<Int>>>>() {}.type
+        val intermediate = gson.fromJson<Map<Int, List<List<Int>>>>(json, type)
+
+        return intermediate.mapValues { (_, cells) ->
+            cells.map { list ->
+                require(list.size == 2) { "Invalid cell coordinates" }
+                list[0] to list[1]
+            }
+        }
+    }
 }

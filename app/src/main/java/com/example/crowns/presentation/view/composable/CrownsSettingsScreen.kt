@@ -16,6 +16,8 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -28,22 +30,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.crowns.R
+import com.example.crowns.data.database.entity.CrownsSettings
 import com.example.crowns.presentation.viewmodel.CrownsSettingsVM
 import kotlin.math.roundToInt
 
 @Composable
-fun CrownsSettingsScreen(navController: NavController, vm: CrownsSettingsVM = viewModel()) {
-    val context = LocalContext.current
-
+fun CrownsSettingsScreen(
+    navController: NavController,
+    vm: CrownsSettingsVM = hiltViewModel()
+) {
     val gradient = Brush.verticalGradient(
         0.0f to colorResource(R.color.secondGradientColor),
         1.0f to Color.White,
         startY = 0.0f,
         endY = 5000.0f
     )
+
+    val settings by vm.settings.collectAsState()
+    val safeSettings = settings ?: CrownsSettings() // Защита от null.
 
     ConstraintLayout(Modifier.fillMaxSize()) {
         val (
@@ -97,7 +105,7 @@ fun CrownsSettingsScreen(navController: NavController, vm: CrownsSettingsVM = vi
             contentAlignment = Alignment.TopCenter
         ) {
             Text(
-                text = "Размер игрового поля: ${vm.getSliderPos().roundToInt()}",
+                text = "Размер игрового поля: ${safeSettings.boardSize}",
                 color = colorResource(R.color.backgroundDark),
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
@@ -114,10 +122,10 @@ fun CrownsSettingsScreen(navController: NavController, vm: CrownsSettingsVM = vi
                 }
         ) {
             Slider(
-                value = vm.getSliderPos(),
+                value = safeSettings.boardSize.toFloat(),
                 valueRange = 5f..12f,
                 steps = 6,
-                onValueChange = { vm.changeSliderPos(it) },
+                onValueChange = { vm.setBoardSize(it.toInt()) },
                 colors = SliderDefaults.colors(
                     thumbColor = colorResource(R.color.backgroundDark),
                     activeTrackColor = colorResource(R.color.backgroundDark),
@@ -127,7 +135,6 @@ fun CrownsSettingsScreen(navController: NavController, vm: CrownsSettingsVM = vi
                 )
             )
         }
-
 
         Box(
             modifier = Modifier
@@ -245,9 +252,9 @@ fun CrownsSettingsScreen(navController: NavController, vm: CrownsSettingsVM = vi
         }
 
         Switch(
-            checked = vm.checkedState1,
+            checked = safeSettings.soundEnabled,
             onCheckedChange = {
-                vm.changeState1(it)
+                vm.setSoundEnabled(it)
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
@@ -263,9 +270,9 @@ fun CrownsSettingsScreen(navController: NavController, vm: CrownsSettingsVM = vi
         )
 
         Switch(
-            checked = vm.checkedState2,
+            checked = safeSettings.showTimer,
             onCheckedChange = {
-                vm.changeState2(it)
+                vm.setTimerEnabled(it)
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
@@ -281,9 +288,9 @@ fun CrownsSettingsScreen(navController: NavController, vm: CrownsSettingsVM = vi
         )
 
         Switch(
-            checked = vm.checkedState3,
+            checked = safeSettings.autoCrossEnabled,
             onCheckedChange = {
-                vm.changeState3(it)
+                vm.setAutoCrossEnabled(it)
             },
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,

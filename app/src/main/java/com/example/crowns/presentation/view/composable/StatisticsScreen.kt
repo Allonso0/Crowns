@@ -38,7 +38,9 @@ import com.example.crowns.presentation.viewmodel.StatisticsVM
 @Composable
 fun StatisticsScreen(navController: NavController) {
     val statsVM: StatisticsVM = hiltViewModel()
-    val stats by statsVM.stats.collectAsState()
+    val statsKillerSudoku by statsVM.statsKS.collectAsState()
+    val statsCrowns by statsVM.statsCrowns.collectAsState()
+
 
     val gradient = Brush.verticalGradient(
         0.0f to colorResource(R.color.secondGradientColor),
@@ -125,37 +127,30 @@ fun StatisticsScreen(navController: NavController) {
             }
 
             item {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Начатых игр (всего)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        modifier = Modifier.padding(start = 10.dp)
                     )
-                }
-            }
 
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
-                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+
                     Text(
-                        text = "Начатых игр (Crowns)",
+                        text = (statsCrowns.startedGames + statsKillerSudoku.startedGames).toString(),
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
                     )
                 }
             }
@@ -165,7 +160,36 @@ fun StatisticsScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Начатых игр (Crowns)",
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = statsCrowns.startedGames.toString(),
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                }
+            }
+
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -180,7 +204,7 @@ fun StatisticsScreen(navController: NavController) {
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = stats.startedGames.toString(),
+                        text = statsKillerSudoku.startedGames.toString(),
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
@@ -190,55 +214,30 @@ fun StatisticsScreen(navController: NavController) {
             }
 
             item {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
-                ) {
-                    Text(
-                        text = "Начатых игр (N-Queens)",
-                        color = colorResource(R.color.backgroundDark),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
-                    )
-                }
-            }
-
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Побед (всего)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        modifier = Modifier.padding(start = 10.dp)
                     )
-                }
-            }
 
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
-                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+
                     Text(
-                        text = "Побед (Crowns)",
+                        text = (statsCrowns.wins + statsKillerSudoku.wins).toString(),
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
                     )
                 }
             }
@@ -248,7 +247,36 @@ fun StatisticsScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Побед (Crowns)",
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = statsCrowns.wins.toString(),
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
+                }
+            }
+
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(45.dp)
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -263,29 +291,11 @@ fun StatisticsScreen(navController: NavController) {
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = stats.wins.toString(),
+                        text = statsKillerSudoku.wins.toString(),
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         modifier = Modifier.padding(end = 16.dp)
-                    )
-                }
-            }
-
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
-                ) {
-                    Text(
-                        text = "Побед (N-Queens)",
-                        color = colorResource(R.color.backgroundDark),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
                     )
                 }
             }
@@ -300,19 +310,30 @@ fun StatisticsScreen(navController: NavController) {
             }
 
             item {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Лучший счёт (Crowns)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = statsCrowns.bestScore.toString(),
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
                     )
                 }
             }
@@ -322,7 +343,7 @@ fun StatisticsScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -336,29 +357,11 @@ fun StatisticsScreen(navController: NavController) {
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = stats.bestScore.toString(),
+                        text = statsKillerSudoku.bestScore.toString(),
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         modifier = Modifier.padding(end = 16.dp)
-                    )
-                }
-            }
-
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
-                ) {
-                    Text(
-                        text = "Лучший счёт (N-Queens)",
-                        color = colorResource(R.color.backgroundDark),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
                     )
                 }
             }
@@ -373,19 +376,30 @@ fun StatisticsScreen(navController: NavController) {
             }
 
             item {
-                Box(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
+                        .background(color = Color.White),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Лучшее время (Crowns)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
+                        modifier = Modifier.padding(start = 10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = statsCrowns.bestTime.timeFormat(),
+                        color = colorResource(R.color.backgroundDark),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        modifier = Modifier.padding(end = 16.dp)
                     )
                 }
             }
@@ -395,7 +409,7 @@ fun StatisticsScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
+                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -410,29 +424,11 @@ fun StatisticsScreen(navController: NavController) {
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = stats.bestTime.timeFormat(),
+                        text = statsKillerSudoku.bestTime.timeFormat(),
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
                         modifier = Modifier.padding(end = 16.dp)
-                    )
-                }
-            }
-
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(45.dp)
-                        .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(30.dp))
-                        .background(color = Color.White)
-                ) {
-                    Text(
-                        text = "Лучшее время (N-Queens)",
-                        color = colorResource(R.color.backgroundDark),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 10.dp, top = 14.dp)
                     )
                 }
             }

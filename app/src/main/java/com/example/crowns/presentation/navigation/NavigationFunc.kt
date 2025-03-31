@@ -11,15 +11,13 @@ import com.example.crowns.domain.model.Difficulty
 import com.example.crowns.presentation.view.composable.CrownsRulesScreen
 import com.example.crowns.presentation.view.composable.CrownsScreen
 import com.example.crowns.presentation.view.composable.CrownsSettingsScreen
+import com.example.crowns.presentation.view.composable.CrownsWinScreen
 import com.example.crowns.presentation.view.composable.KillerSudokuLoseScreen
 import com.example.crowns.presentation.view.composable.KillerSudokuRulesScreen
 import com.example.crowns.presentation.view.composable.KillerSudokuScreen
 import com.example.crowns.presentation.view.composable.KillerSudokuSettingsScreen
 import com.example.crowns.presentation.view.composable.KillerSudokuWinScreen
 import com.example.crowns.presentation.view.composable.MainMenuScreen
-import com.example.crowns.presentation.view.composable.NQueensRulesScreen
-import com.example.crowns.presentation.view.composable.NQueensScreen
-import com.example.crowns.presentation.view.composable.NQueensSettingsScreen
 import com.example.crowns.presentation.view.composable.StatisticsScreen
 import com.example.crowns.presentation.viewmodel.KillerSudokuVM
 
@@ -59,18 +57,6 @@ fun NavigationFunc() {
             KillerSudokuSettingsScreen(navController)
         }
 
-        composable("NQueens") {
-            NQueensScreen(navController)
-        }
-
-        composable("NQueensRules") {
-            NQueensRulesScreen(navController)
-        }
-
-        composable("NQueensSettings") {
-            NQueensSettingsScreen(navController)
-        }
-
         composable("Statistics") {
             StatisticsScreen(navController)
         }
@@ -96,6 +82,22 @@ fun NavigationFunc() {
                 onMenu = {
                     navController.popBackStack("MainMenu", inclusive = false)
                 }
+            )
+        }
+
+        composable(
+            route = "WinScreenCrowns?score={score}&time={time}",
+            arguments = listOf(
+                navArgument("score") { type = NavType.IntType },
+                navArgument("time") { type = NavType.LongType }
+            )
+        ) { backStackEntry ->
+            val score = backStackEntry.arguments?.getInt("score") ?: 0
+            val time = backStackEntry.arguments?.getLong("time") ?: 0L
+            CrownsWinScreen(
+                score = score,
+                time = time,
+                onMenu = { navController.popBackStack("MainMenu", inclusive = false) }
             )
         }
     }

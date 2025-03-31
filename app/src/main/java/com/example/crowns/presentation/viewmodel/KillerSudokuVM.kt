@@ -1,7 +1,6 @@
 package com.example.crowns.presentation.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.crowns.CrownsApplication
@@ -39,7 +38,7 @@ class KillerSudokuVM @Inject constructor(
     private val application: Application
 ) : ViewModel() {
 
-    // Состояние UI
+    // Состояние UI.
     private val _uiState = MutableStateFlow<KillerSudokuUiState>(KillerSudokuUiState.Loading)
     val uiState: StateFlow<KillerSudokuUiState> = _uiState.asStateFlow()
 
@@ -74,6 +73,10 @@ class KillerSudokuVM @Inject constructor(
         (application as CrownsApplication).soundManager
     }
 
+    /**
+     * Блок инициализации ViewModel. Он загружает настройки игры из репозитория
+     * и восстанавливает сохраненное состояние или запускает новую игру.
+     */
     init {
         loadSettings()
         viewModelScope.launch {
@@ -86,6 +89,9 @@ class KillerSudokuVM @Inject constructor(
         }
     }
 
+    /**
+     * Функция loadSettings загружает настройки игры из репозитория.
+     */
     private fun loadSettings() {
         viewModelScope.launch {
             settingsRepository.getSettings().collect {
@@ -94,6 +100,10 @@ class KillerSudokuVM @Inject constructor(
         }
     }
 
+    /**
+     * Функция restoreState восстанавливает состояние из сохраненной сессии.
+     * Она загружает решение, подсказки и таймер.
+     */
     private fun restoreState(savedState: KillerSudokuState) {
         correctSolution = savedState.correctSolution
         _hintCells.addAll(savedState.hintCells)
@@ -218,6 +228,9 @@ class KillerSudokuVM @Inject constructor(
         checkGameCompletion(newBoard, score)
     }
 
+    /**
+     * Функция saveCurrentState cохраняет текущее состояние игры.
+     */
     private fun saveCurrentState() {
         val state = _uiState.value as? KillerSudokuUiState.Success ?: return
         viewModelScope.launch {
@@ -235,6 +248,10 @@ class KillerSudokuVM @Inject constructor(
         }
     }
 
+    /**
+     * Функция checkGameCompletion проверяет условия завершения игры
+     * и вызывает соответствующие функции для победы или поражения.
+     */
     private fun checkGameCompletion(board: KillerSudokuBoard, score: Int) {
         val currentSettings = _settings.value
         if (currentSettings?.errorLimitEnabled == true && _totalErrors >= 3) {
@@ -244,6 +261,22 @@ class KillerSudokuVM @Inject constructor(
         }
     }
 
+    /**
+     * Функция isBoardComplete проверяет заполнена ли доска целиком или нет.
+     * При этом проверяется, что все ячейки не являются ошибочно поставленными.
+     */
+    private fun isBoardComplete(board: KillerSudokuBoard): Boolean {
+        return board.cells.all { row ->
+            row.all { cell ->
+                cell.value != null && !cell.isError
+            }
+        } && verifyUC(board)
+    }
+
+    /**
+     * Функция handleGameOver обрабатывает завершение игры (поражение).
+     * Она сбрасывает прогресс и сохраняет результат в статистику.
+     */
     private fun handleGameOver() {
         viewModelScope.launch {
             val currentState = _uiState.value as? KillerSudokuUiState.Success ?: return@launch
@@ -262,6 +295,10 @@ class KillerSudokuVM @Inject constructor(
         }
     }
 
+    /**
+     * Функция handleVictory обрабатывает завершение игры (победу).
+     * Она сбрасывает прогресс и сохраняет результат в статистику.
+     */
     private fun handleVictory(score: Int) {
         viewModelScope.launch {
             val currentState = _uiState.value as? KillerSudokuUiState.Success ?: return@launch
@@ -296,13 +333,6 @@ class KillerSudokuVM @Inject constructor(
                 elapsedTime = _elapsedTime.value
             )
         }
-    }
-
-    /**
-     * Функция calculateErrorCount отвечает за подсчет количества ошибок на доске.
-     */
-    private fun calculateErrorCount(board: KillerSudokuBoard): Int {
-        return board.cells.flatMap { row -> row.filter { it.isError } }.size
     }
 
     /**
@@ -535,18 +565,17 @@ class KillerSudokuVM @Inject constructor(
         )
     }
 
-    private fun isBoardComplete(board: KillerSudokuBoard): Boolean {
-        return board.cells.all { row ->
-            row.all { cell ->
-                cell.value != null && !cell.isError
-            }
-        }
-    }
-
+    /**
+     * Функция onExit вызывается при выходе из экрана.
+     * Она сохраняет текущий прогресс и останавливает таймер.
+     */
     fun onExit() {
         saveCurrentState()
     }
 
+    /**
+     * Функция loadSavedState загружает сохраненное состояние.
+     */
     fun loadSavedState() {
         viewModelScope.launch {
             val savedState = repository.loadState()
@@ -556,6 +585,9 @@ class KillerSudokuVM @Inject constructor(
         }
     }
 
+    /**
+     * Функция startTimer отвечает за запуск внутреигрового таймера.
+     */
     fun startTimer() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
@@ -567,15 +599,25 @@ class KillerSudokuVM @Inject constructor(
         }
     }
 
+    /**
+     * Функция stopTimer отвечает за остановку внутреигрового таймера.
+     */
     fun stopTimer() {
         timerJob?.cancel()
         timerJob = null
     }
 
+    /**
+     * Функция resetTimer отвечает за сброс внутреигрового таймера.
+     */
     fun resetTimer() {
         _elapsedTime.value = 0L
     }
 
+    /**
+     * Функция incrementStartedGames увеличивает число начатых игр
+     * для экрана статистики.
+     */
     fun incrementStartedGames() {
         viewModelScope.launch {
             statisticRepository.updateStats {

@@ -163,7 +163,7 @@ private fun GameContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .height(90.dp)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
                 .background(color = Color.White)
                 .constrainAs(upperBar) {
@@ -236,7 +236,7 @@ private fun GameContent(
             contentColor = Color.White,
             containerColor = colorResource(R.color.backgroundDark),
             modifier = Modifier
-                .size(40.dp)
+                .size(50.dp)
                 .constrainAs(butHome) {
                     absoluteLeft.linkTo(parent.absoluteLeft, margin = 20.dp)
                     top.linkTo(parent.top, margin = 20.dp)
@@ -257,7 +257,7 @@ private fun GameContent(
             contentColor = Color.White,
             containerColor = colorResource(R.color.backgroundDark),
             modifier = Modifier
-                .size(40.dp)
+                .size(50.dp)
                 .constrainAs(butRules) {
                     absoluteRight.linkTo(parent.absoluteRight, margin = 20.dp)
                     top.linkTo(parent.top, margin = 20.dp)
@@ -691,7 +691,7 @@ private fun ClearButton(onClick: () -> Unit) {
         contentColor = colorResource(R.color.backgroundDark)
     ) {
         Icon(
-            painter = painterResource(R.drawable.replay),
+            painter = painterResource(R.drawable.delete),
             contentDescription = "Очистить всё",
             modifier = Modifier.size(30.dp)
         )

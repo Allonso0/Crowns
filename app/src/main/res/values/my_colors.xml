@@ -4,4 +4,18 @@
     <color name="backgroundDark">#626FE5</color>
     <color name="secondGradientColor">#AEB6FF</color>
     <color name="highlight_background">#E3F2FD</color>
+
+    <color name="region_1">#BAEBFF</color>
+    <color name="region_2">#BBDBFE</color>
+    <color name="region_3">#BCCBFD</color>
+    <color name="region_4">#BEBCFC</color>
+    <color name="region_5">#bfacfb</color>
+    <color name="region_6">#c09cfa</color>
+    <color name="region_7">#c18cf9</color>
+    <color name="region_8">#c37df8</color>
+    <color name="region_9">#c46df7</color>
+    <color name="region_10">#c55df6</color>
+    <color name="region_11">#c78df2</color>
+    <color name="region_12">#c99df1</color>
+
 </resources>
