@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface KillerSudokuSettingsDao {
     // Получение настроек в виде потока.
     @Query("SELECT * FROM killer_sudoku_settings WHERE id = 1")
-    fun getKillerSudokuSettings(): Flow<KillerSudokuSettings>
+    fun getKillerSudokuSettings(): Flow<KillerSudokuSettings?>
 
     // Вставка или замена настроек (при конфликте ID).
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -29,7 +29,7 @@ import com.example.crowns.data.database.entity.KillerSudokuStats
         CrownsStats::class,
         CrownsSettings::class
     ],
-    version = 19,
+    version = 21,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

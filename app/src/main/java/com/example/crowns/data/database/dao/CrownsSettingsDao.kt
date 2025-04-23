@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface CrownsSettingsDao {
     // Получение настроек в виде потока.
     @Query("SELECT * FROM crowns_settings WHERE id = 1")
-    fun getSettings(): Flow<CrownsSettings>
+    fun getSettings(): Flow<CrownsSettings?>
 
     // Вставка или замена настроек (при конфликте ID).
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -194,7 +194,7 @@ fun MainMenuScreen(navController: NavController) {
         }
 
         Text(
-            text = "Mobile app “Crowns” v 1.0",
+            text = "Mobile app “Crowns” v 1.0.1",
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.backgroundLight),
