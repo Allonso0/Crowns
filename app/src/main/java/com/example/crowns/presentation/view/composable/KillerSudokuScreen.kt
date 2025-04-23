@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -163,27 +165,31 @@ private fun GameContent(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp)
+                .fillMaxHeight(0.12f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
                 .background(color = Color.White)
                 .constrainAs(upperBar) {
                     centerHorizontallyTo(parent)
                     top.linkTo(parent.top)
                 }
-        )
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
 
-        // Отображение текущего счета.
-        Text(
-            text = "Счет: ${state.score}",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.backgroundDark),
-            modifier = Modifier
-                .constrainAs(score) {
-                    centerHorizontallyTo(parent)
-                    centerVerticallyTo(upperBar)
-                }
-        )
+                Text(
+                    text = "Счет: ${state.score}",
+                    color = colorResource(R.color.backgroundDark),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
 
         settings.let { safeSettings ->
             if (safeSettings.showTimer) {
@@ -236,10 +242,10 @@ private fun GameContent(
             contentColor = Color.White,
             containerColor = colorResource(R.color.backgroundDark),
             modifier = Modifier
-                .size(50.dp)
+                .size(65.dp)
                 .constrainAs(butHome) {
                     absoluteLeft.linkTo(parent.absoluteLeft, margin = 20.dp)
-                    top.linkTo(parent.top, margin = 20.dp)
+                    bottom.linkTo(upperBar.bottom, margin = 20.dp)
                 },
             shape = RoundedCornerShape(12.dp),
             onClick = {
@@ -257,10 +263,10 @@ private fun GameContent(
             contentColor = Color.White,
             containerColor = colorResource(R.color.backgroundDark),
             modifier = Modifier
-                .size(50.dp)
+                .size(65.dp)
                 .constrainAs(butRules) {
                     absoluteRight.linkTo(parent.absoluteRight, margin = 20.dp)
-                    top.linkTo(parent.top, margin = 20.dp)
+                    bottom.linkTo(upperBar.bottom, margin = 20.dp)
                 },
             shape = RoundedCornerShape(12.dp),
             onClick = {
@@ -280,14 +286,13 @@ private fun GameContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f)
-                .padding(16.dp)
+                .padding(25.dp)
                 .constrainAs(gameField) {
                     top.linkTo(upperBar.bottom)
                     centerHorizontallyTo(parent)
                     width = Dimension.fillToConstraints
                     height = Dimension.ratio("1:1")
                 }
-                .requiredSize(300.dp)
         ) {
             SudokuField(
                 board = state.board,
@@ -461,12 +466,12 @@ private fun DrawScope.drawCage(
 ) {
     val path = Path()
     val textPaint = Paint().apply {
-        textSize = 8.sp.toPx()
+        textSize = 10.sp.toPx()
         color = android.graphics.Color.parseColor("#222222")
         typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
     }
 
-    val padding = 3.dp.toPx() // Отступ пунктира от границы клетки.
+    val padding = 4.dp.toPx() // Отступ пунктира от границы клетки.
 
     cells.forEach { (row, col) ->
         // Верхняя граница.
@@ -506,8 +511,8 @@ private fun DrawScope.drawCage(
     val sum = board.cells[minCell.first][minCell.second].cageSum.toString()
     drawContext.canvas.nativeCanvas.drawText(
         sum,
-        minCell.second * cellSize + 6.dp.toPx(),
-        minCell.first * cellSize + 11.dp.toPx(),
+        minCell.second * cellSize + 5.dp.toPx(),
+        minCell.first * cellSize + 13.dp.toPx(),
         textPaint
     )
 }
@@ -522,26 +527,26 @@ private fun DrawScope.drawCellValues(
     settings: KillerSudokuSettings
 ) {
     val fixedPaint = Paint().apply {
-        textSize = 16.sp.toPx()
+        textSize = 18.sp.toPx()
         color = android.graphics.Color.BLACK
         textAlign = android.graphics.Paint.Align.CENTER
     }
 
     val correctPaint = Paint().apply {
         color = android.graphics.Color.parseColor("#003494")
-        textSize = 16.sp.toPx()
+        textSize = 18.sp.toPx()
         textAlign = android.graphics.Paint.Align.CENTER
     }
 
     val errorPaint = Paint().apply {
         color = android.graphics.Color.parseColor("#B20000")
-        textSize = 16.sp.toPx()
+        textSize = 18.sp.toPx()
         textAlign = android.graphics.Paint.Align.CENTER
     }
 
     val hintPaint = Paint().apply {
         color = android.graphics.Color.parseColor("#006600")
-        textSize = 16.sp.toPx()
+        textSize = 18.sp.toPx()
         textAlign = android.graphics.Paint.Align.CENTER
     }
 
@@ -590,7 +595,7 @@ private fun NumberButton(
     Button(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.size(50.dp),
+        modifier = Modifier.size(55.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = colorResource(R.color.backgroundLight),
             contentColor = colorResource(R.color.backgroundDark)
@@ -598,7 +603,7 @@ private fun NumberButton(
     ) {
         Text(
             text = number.toString(),
-            fontSize = 20.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -667,14 +672,14 @@ fun FullScreenLoader() {
 private fun EraserButton(onClick: () -> Unit) {
     FloatingActionButton(
         onClick = onClick,
-        modifier = Modifier.size(50.dp),
+        modifier = Modifier.size(55.dp),
         containerColor = colorResource(R.color.backgroundLight),
         contentColor = colorResource(R.color.backgroundDark)
     ) {
         Icon(
             painter = painterResource(R.drawable.eraser),
             contentDescription = "Ластик",
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier.size(40.dp)
         )
     }
 }
@@ -686,14 +691,14 @@ private fun EraserButton(onClick: () -> Unit) {
 private fun ClearButton(onClick: () -> Unit) {
     FloatingActionButton(
         onClick = onClick,
-        modifier = Modifier.size(50.dp),
+        modifier = Modifier.size(55.dp),
         containerColor = colorResource(R.color.backgroundLight),
         contentColor = colorResource(R.color.backgroundDark)
     ) {
         Icon(
             painter = painterResource(R.drawable.delete),
             contentDescription = "Очистить всё",
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier.size(40.dp)
         )
     }
 }
@@ -705,14 +710,14 @@ private fun ClearButton(onClick: () -> Unit) {
 private fun HintButton(onClick: () -> Unit) {
     FloatingActionButton(
         onClick = onClick,
-        modifier = Modifier.size(50.dp),
+        modifier = Modifier.size(55.dp),
         containerColor = colorResource(R.color.backgroundLight),
         contentColor = colorResource(R.color.backgroundDark)
     ) {
         Icon(
             painter = painterResource(R.drawable.idea),
             contentDescription = "Подсказка",
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier.size(40.dp)
         )
     }
 }

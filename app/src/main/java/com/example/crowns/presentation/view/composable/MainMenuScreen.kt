@@ -67,9 +67,7 @@ fun MainMenuScreen(navController: NavController) {
                 .shadow(elevation = 16.dp, shape = CircleShape)
                 .background(color = colorResource(R.color.backgroundLight))
                 .constrainAs(logo) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(butCrowns.top, margin = 10.dp)
-                    centerHorizontallyTo(parent)
+                    top.linkTo(parent.top, margin = 100.dp)
                     centerHorizontallyTo(parent)
                 },
             contentAlignment = Alignment.Center
@@ -93,7 +91,7 @@ fun MainMenuScreen(navController: NavController) {
                 .height(70.dp)
                 .constrainAs(butCrowns) {
                     absoluteLeft.linkTo(butStats.absoluteLeft)
-                    centerVerticallyTo(parent)
+                    top.linkTo(logo.bottom, margin = 50.dp)
                 },
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
             shape = RoundedCornerShape(20.dp),
@@ -115,7 +113,7 @@ fun MainMenuScreen(navController: NavController) {
                 .height(70.dp)
                 .constrainAs(butCrownsSet) {
                     absoluteRight.linkTo(butStats.absoluteRight)
-                    centerVerticallyTo(parent)
+                    top.linkTo(butCrowns.top)
                 },
             shape = RoundedCornerShape(20.dp),
             onClick = {
@@ -201,7 +199,7 @@ fun MainMenuScreen(navController: NavController) {
             fontWeight = FontWeight.Bold,
             color = colorResource(R.color.backgroundLight),
             modifier = Modifier.constrainAs(text) {
-                bottom.linkTo(parent.bottom, margin = 16.dp)
+                bottom.linkTo(parent.bottom, margin = 50.dp)
                 centerHorizontallyTo(parent)
             }
         )

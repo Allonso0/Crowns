@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -164,7 +165,7 @@ fun CrownsBoardComposable(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp)
+                .fillMaxHeight(0.12f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
                 .background(color = Color.White)
                 .constrainAs(upperToolbar) {
@@ -173,13 +174,22 @@ fun CrownsBoardComposable(
                 },
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Crowns",
-                textAlign = TextAlign.Center,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(R.color.backgroundDark)
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    text = "Crowns",
+                    color = colorResource(R.color.backgroundDark),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
 
         // Нижний тулбар (таймер).
@@ -352,10 +362,10 @@ fun CrownsBoardComposable(
             contentColor = Color.White,
             containerColor = colorResource(R.color.backgroundDark),
             modifier = Modifier
-                .size(50.dp)
+                .size(65.dp)
                 .constrainAs(butHome) {
                     absoluteLeft.linkTo(parent.absoluteLeft, margin = 20.dp)
-                    top.linkTo(parent.top, margin = 20.dp)
+                    bottom.linkTo(upperToolbar.bottom, margin = 20.dp)
                 },
             shape = RoundedCornerShape(12.dp),
             onClick = {
@@ -373,10 +383,10 @@ fun CrownsBoardComposable(
             contentColor = Color.White,
             containerColor = colorResource(R.color.backgroundDark),
             modifier = Modifier
-                .size(50.dp)
+                .size(65.dp)
                 .constrainAs(butRules) {
                     absoluteRight.linkTo(parent.absoluteRight, margin = 20.dp)
-                    top.linkTo(parent.top, margin = 20.dp)
+                    bottom.linkTo(upperToolbar.bottom, margin = 20.dp)
                 },
             shape = RoundedCornerShape(12.dp),
             onClick = {

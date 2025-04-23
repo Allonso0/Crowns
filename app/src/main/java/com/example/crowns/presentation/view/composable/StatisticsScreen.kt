@@ -4,9 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +29,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -61,21 +64,30 @@ fun StatisticsScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .fillMaxHeight(0.1f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
                 .background(color = Color.White)
                 .constrainAs(title) {
                     centerHorizontallyTo(parent)
                     top.linkTo(parent.top)
-                },
-            contentAlignment = Alignment.Center
+                }
         ) {
-            Text(
-                text = "Статистика",
-                color = colorResource(R.color.backgroundDark),
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    text = "Статистика",
+                    color = colorResource(R.color.backgroundDark),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
 
         Button(
@@ -84,11 +96,11 @@ fun StatisticsScreen(navController: NavController) {
                 containerColor = colorResource(R.color.backgroundDark)
             ),
             modifier = Modifier
-                .width(120.dp)
-                .height(40.dp)
+                .fillMaxWidth(0.45f)
+                .height(55.dp)
                 .constrainAs(butHome) {
                     centerHorizontallyTo(parent)
-                    bottom.linkTo(parent.bottom, margin = 40.dp)
+                    bottom.linkTo(parent.bottom, margin = 60.dp)
                 },
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
             shape = RoundedCornerShape(12.dp),
@@ -98,15 +110,15 @@ fun StatisticsScreen(navController: NavController) {
         ) {
             Text(
                 text = "Назад",
-                fontSize = 20.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
         LazyColumn(
             modifier = Modifier
-                .width(320.dp)
-                .height(600.dp)
+                .fillMaxWidth(0.85f)
+                .fillMaxHeight(0.7f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(20.dp))
                 .background(color = Color.White)
                 .constrainAs(lazyCol) {
@@ -122,7 +134,7 @@ fun StatisticsScreen(navController: NavController) {
                     text = "Игры",
                     color = colorResource(R.color.backgroundDark),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                    fontSize = 24.sp
                 )
             }
 
@@ -130,7 +142,7 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
@@ -139,7 +151,7 @@ fun StatisticsScreen(navController: NavController) {
                         text = "Начатых игр (всего)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(start = 10.dp)
                     )
 
@@ -159,7 +171,7 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
@@ -168,7 +180,7 @@ fun StatisticsScreen(navController: NavController) {
                         text = "Начатых игр (Crowns)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(start = 10.dp)
                     )
 
@@ -188,7 +200,7 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
@@ -197,7 +209,7 @@ fun StatisticsScreen(navController: NavController) {
                         text = "Начатых игр (Killer Sudoku)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(start = 10.dp)
                     )
 
@@ -217,7 +229,7 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
@@ -226,7 +238,7 @@ fun StatisticsScreen(navController: NavController) {
                         text = "Побед (всего)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(start = 10.dp)
                     )
 
@@ -246,7 +258,7 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
@@ -255,7 +267,7 @@ fun StatisticsScreen(navController: NavController) {
                         text = "Побед (Crowns)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(start = 10.dp)
                     )
 
@@ -275,7 +287,7 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
@@ -284,7 +296,7 @@ fun StatisticsScreen(navController: NavController) {
                         text = "Побед (Killer Sudoku)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(start = 10.dp)
                     )
 
@@ -305,7 +317,7 @@ fun StatisticsScreen(navController: NavController) {
                     text = "Счёт",
                     color = colorResource(R.color.backgroundDark),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                    fontSize = 24.sp
                 )
             }
 
@@ -313,7 +325,7 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
@@ -322,7 +334,7 @@ fun StatisticsScreen(navController: NavController) {
                         text = "Лучший счёт (Crowns)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(start = 10.dp)
                     )
 
@@ -342,13 +354,14 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Лучший счёт (Killer Sudoku)",
+                        fontSize = 16.sp,
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(start = 10.dp)
@@ -371,7 +384,7 @@ fun StatisticsScreen(navController: NavController) {
                     text = "Время",
                     color = colorResource(R.color.backgroundDark),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                    fontSize = 24.sp
                 )
             }
 
@@ -379,7 +392,7 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
@@ -388,7 +401,7 @@ fun StatisticsScreen(navController: NavController) {
                         text = "Лучшее время (Crowns)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(start = 10.dp)
                     )
 
@@ -408,7 +421,7 @@ fun StatisticsScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(45.dp)
+                        .height(60.dp)
                         .border(width = 1.dp, color = colorResource(R.color.backgroundDark), shape = RoundedCornerShape(20.dp))
                         .background(color = Color.White),
                     verticalAlignment = Alignment.CenterVertically
@@ -417,7 +430,7 @@ fun StatisticsScreen(navController: NavController) {
                         text = "Лучшее время (Killer Sudoku)",
                         color = colorResource(R.color.backgroundDark),
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(start = 10.dp)
                     )
 

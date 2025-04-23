@@ -2,7 +2,11 @@ package com.example.crowns.presentation.view.composable
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -56,21 +60,30 @@ fun CrownsRulesScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .fillMaxHeight(0.1f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
                 .background(color = Color.White)
                 .constrainAs(toolbar) {
                     centerHorizontallyTo(parent)
                     top.linkTo(parent.top)
                 },
-            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Как играть?",
-                color = colorResource(R.color.backgroundDark),
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    text = "Как играть?",
+                    color = colorResource(R.color.backgroundDark),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
 
         Box(
@@ -90,15 +103,15 @@ fun CrownsRulesScreen(navController: NavController) {
                         "2. Нажмите один раз, чтобы установить крестик в ячейку и дважды, чтобы установить в ячейку корону. Используйте крестики, чтобы обозначить ячейки, куда нельзя поставить корону.\n",
                 color = colorResource(R.color.backgroundDark),
                 fontWeight = FontWeight.Bold,
-                fontSize = 15.sp,
+                fontSize = 16.sp,
                 modifier = Modifier.padding(20.dp)
             )
         }
 
         Box (
             modifier = Modifier
-                .width(300.dp)
-                .height(300.dp)
+                .width(350.dp)
+                .height(350.dp)
                 .constrainAs(image) {
                     centerVerticallyTo(parent)
                     centerHorizontallyTo(parent)
@@ -108,7 +121,7 @@ fun CrownsRulesScreen(navController: NavController) {
             Image(
                 bitmap = ImageBitmap.imageResource(R.drawable.hamster),
                 contentDescription = "Хомяк",
-                modifier = Modifier.size(300.dp)
+                modifier = Modifier.size(350.dp)
             )
         }
 
@@ -118,11 +131,11 @@ fun CrownsRulesScreen(navController: NavController) {
                 containerColor = colorResource(R.color.backgroundDark)
             ),
             modifier = Modifier
-                .width(120.dp)
-                .height(40.dp)
+                .fillMaxWidth(0.45f)
+                .height(55.dp)
                 .constrainAs(button) {
                     centerHorizontallyTo(parent)
-                    bottom.linkTo(parent.bottom, margin = 40.dp)
+                    bottom.linkTo(parent.bottom, margin = 60.dp)
                 },
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp),
             shape = RoundedCornerShape(12.dp),
@@ -132,7 +145,7 @@ fun CrownsRulesScreen(navController: NavController) {
         ) {
             Text(
                 text = "Ясно",
-                fontSize = 20.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }

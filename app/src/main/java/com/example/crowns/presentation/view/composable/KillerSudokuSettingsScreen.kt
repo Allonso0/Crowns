@@ -1,8 +1,11 @@
 package com.example.crowns.presentation.view.composable
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -86,7 +89,7 @@ fun KillerSudokuSettingsScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .fillMaxHeight(0.1f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
                 .background(color = Color.White)
                 .constrainAs(title) {
@@ -95,12 +98,22 @@ fun KillerSudokuSettingsScreen(
                 },
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Настройки",
-                color = colorResource(R.color.backgroundDark),
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    text = "Настройки",
+                    color = colorResource(R.color.backgroundDark),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
 
         // Кнопка "Назад".
@@ -110,8 +123,8 @@ fun KillerSudokuSettingsScreen(
                 containerColor = colorResource(R.color.backgroundDark)
             ),
             modifier = Modifier
-                .width(120.dp)
-                .height(40.dp)
+                .fillMaxWidth(0.45f)
+                .height(55.dp)
                 .constrainAs(butHome) {
                     centerHorizontallyTo(parent)
                     bottom.linkTo(parent.bottom, margin = 40.dp)
@@ -124,7 +137,7 @@ fun KillerSudokuSettingsScreen(
         ) {
             Text(
                 text = "Назад",
-                fontSize = 20.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -132,13 +145,13 @@ fun KillerSudokuSettingsScreen(
         // Настройка сложности.
         Box(
             modifier = Modifier
-                .width(320.dp)
-                .height(98.dp)
+                .fillMaxWidth(0.75f)
+                .fillMaxHeight(0.1f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
                 .background(color = Color.White)
                 .constrainAs(box1) {
                     centerHorizontallyTo(parent)
-                    top.linkTo(title.bottom, margin = 20.dp)
+                    top.linkTo(title.bottom, margin = 40.dp)
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -146,7 +159,6 @@ fun KillerSudokuSettingsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    //text = "Сложность: ${settings.difficulty.name}",
                     text = when(safeSettings.difficulty) {
                         Difficulty.EASY -> "Сложность: легко"
                         Difficulty.MEDIUM -> "Сложность: средне"
@@ -169,15 +181,15 @@ fun KillerSudokuSettingsScreen(
                         inactiveTickColor = colorResource(R.color.backgroundLight),
                         activeTickColor = colorResource(R.color.backgroundDark)
                     ),
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp)
+                    modifier = Modifier.padding(start = 25.dp, end = 25.dp)
                 )
             }
         }
 
         Box(
             modifier = Modifier
-                .width(320.dp)
-                .height(90.dp)
+                .fillMaxWidth(0.75f)
+                .fillMaxHeight(0.1f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
                 .background(color = Color.White)
                 .constrainAs(box2) {
@@ -188,7 +200,7 @@ fun KillerSudokuSettingsScreen(
 
         Box (
             modifier = Modifier
-                .width(290.dp)
+                .fillMaxWidth(0.7f)
                 .height(1.dp)
                 .alpha(0.35f)
                 .background(Color.Black)
@@ -199,7 +211,8 @@ fun KillerSudokuSettingsScreen(
 
         Box (
             modifier = Modifier.constrainAs(textVolume) {
-                top.linkTo(box2.top, margin = 15.dp)
+                top.linkTo(box2.top)
+                bottom.linkTo(innerLine.top)
                 absoluteLeft.linkTo(box2.absoluteLeft, margin = 15.dp)
             }
         ) {
@@ -213,7 +226,8 @@ fun KillerSudokuSettingsScreen(
 
         Box (
             modifier = Modifier.constrainAs(textTimer) {
-                bottom.linkTo(box2.bottom, margin = 15.dp)
+                bottom.linkTo(box2.bottom)
+                top.linkTo(innerLine.bottom)
                 absoluteLeft.linkTo(box2.absoluteLeft, margin = 15.dp)
             }
         ) {
@@ -239,6 +253,7 @@ fun KillerSudokuSettingsScreen(
             ),
             modifier = Modifier.constrainAs(switch1) {
                 top.linkTo(box2.top)
+                bottom.linkTo(innerLine.bottom)
                 absoluteRight.linkTo(box2.absoluteRight, margin = 15.dp)
             }
         )
@@ -257,14 +272,15 @@ fun KillerSudokuSettingsScreen(
             ),
             modifier = Modifier.constrainAs(switch2) {
                 bottom.linkTo(box2.bottom)
+                top.linkTo(innerLine.top)
                 absoluteRight.linkTo(box2.absoluteRight, margin = 15.dp)
             }
         )
 
         Box(
             modifier = Modifier
-                .width(320.dp)
-                .height(45.dp)
+                .fillMaxWidth(0.75f)
+                .fillMaxHeight(0.05f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
                 .background(color = Color.White)
                 .constrainAs(box3) {
@@ -284,10 +300,10 @@ fun KillerSudokuSettingsScreen(
 
         Box(
             modifier = Modifier
-                .width(290.dp)
+                .fillMaxWidth(0.7f)
                 .constrainAs(explain1) {
                     absoluteLeft.linkTo(box3.absoluteLeft, margin = 15.dp)
-                    top.linkTo(box3.bottom, margin = 5.dp)
+                    top.linkTo(box3.bottom, margin = 10.dp)
                 }
         ) {
             Text(
@@ -319,8 +335,8 @@ fun KillerSudokuSettingsScreen(
 
         Box(
             modifier = Modifier
-                .width(320.dp)
-                .height(45.dp)
+                .fillMaxWidth(0.75f)
+                .fillMaxHeight(0.05f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
                 .background(color = Color.White)
                 .constrainAs(box4) {
@@ -340,10 +356,10 @@ fun KillerSudokuSettingsScreen(
 
         Box(
             modifier = Modifier
-                .width(290.dp)
+                .fillMaxWidth(0.7f)
                 .constrainAs(explain2) {
                     absoluteLeft.linkTo(box4.absoluteLeft, margin = 15.dp)
-                    top.linkTo(box4.bottom, margin = 5.dp)
+                    top.linkTo(box4.bottom, margin = 10.dp)
                 }
         ) {
             Text(
@@ -375,8 +391,8 @@ fun KillerSudokuSettingsScreen(
 
         Box(
             modifier = Modifier
-                .width(320.dp)
-                .height(45.dp)
+                .fillMaxWidth(0.75f)
+                .fillMaxHeight(0.05f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
                 .background(color = Color.White)
                 .constrainAs(box5) {
@@ -396,10 +412,10 @@ fun KillerSudokuSettingsScreen(
 
         Box(
             modifier = Modifier
-                .width(290.dp)
+                .fillMaxWidth(0.7f)
                 .constrainAs(explain3) {
                     absoluteLeft.linkTo(box5.absoluteLeft, margin = 15.dp)
-                    top.linkTo(box5.bottom, margin = 5.dp)
+                    top.linkTo(box5.bottom, margin = 10.dp)
                 }
         ) {
             Text(

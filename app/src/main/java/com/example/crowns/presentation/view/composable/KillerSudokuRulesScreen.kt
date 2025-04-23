@@ -2,7 +2,11 @@ package com.example.crowns.presentation.view.composable
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -57,21 +61,30 @@ fun KillerSudokuRulesScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .fillMaxHeight(0.1f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
                 .background(color = Color.White)
                 .constrainAs(toolbar) {
                     centerHorizontallyTo(parent)
                     top.linkTo(parent.top)
                 },
-            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Как играть?",
-                color = colorResource(R.color.backgroundDark),
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    text = "Как играть?",
+                    color = colorResource(R.color.backgroundDark),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
 
         Box(
@@ -95,7 +108,7 @@ fun KillerSudokuRulesScreen(navController: NavController) {
                         "3. Одно и то же число не может встречаться в клетке более одного раза.",
                 color = colorResource(R.color.backgroundDark),
                 fontWeight = FontWeight.Bold,
-                fontSize = 15.sp,
+                fontSize = 16.sp,
                 modifier = Modifier.padding(20.dp)
             )
         }
@@ -123,8 +136,8 @@ fun KillerSudokuRulesScreen(navController: NavController) {
                 containerColor = colorResource(R.color.backgroundDark)
             ),
             modifier = Modifier
-                .width(120.dp)
-                .height(40.dp)
+                .fillMaxWidth(0.45f)
+                .height(55.dp)
                 .constrainAs(button) {
                     centerHorizontallyTo(parent)
                     bottom.linkTo(parent.bottom, margin = 40.dp)
@@ -137,7 +150,7 @@ fun KillerSudokuRulesScreen(navController: NavController) {
         ) {
             Text(
                 text = "Ясно",
-                fontSize = 20.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }

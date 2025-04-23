@@ -1,7 +1,11 @@
 package com.example.crowns.presentation.view.composable
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -75,7 +79,7 @@ fun CrownsSettingsScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(80.dp)
+                .fillMaxHeight(0.1f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(bottomEnd = 20.dp, bottomStart = 20.dp))
                 .background(color = Color.White)
                 .constrainAs(title) {
@@ -84,23 +88,33 @@ fun CrownsSettingsScreen(
                 },
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Настройки",
-                color = colorResource(R.color.backgroundDark),
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Text(
+                    text = "Настройки",
+                    color = colorResource(R.color.backgroundDark),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
 
         Box(
             modifier = Modifier
-                .width(320.dp)
-                .height(98.dp)
+                .fillMaxWidth(0.75f)
+                .fillMaxHeight(0.1f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
                 .background(color = Color.White)
                 .constrainAs(box1) {
                     centerHorizontallyTo(parent)
-                    top.linkTo(title.bottom, margin = 20.dp)
+                    top.linkTo(title.bottom, margin = 40.dp)
                 },
             contentAlignment = Alignment.TopCenter
         ) {
@@ -115,7 +129,7 @@ fun CrownsSettingsScreen(
 
         Box(
             modifier = Modifier
-                .width(290.dp)
+                .fillMaxWidth(0.65f)
                 .constrainAs(slider) {
                     bottom.linkTo(box1.bottom, margin = 15.dp)
                     centerHorizontallyTo(box1)
@@ -138,8 +152,8 @@ fun CrownsSettingsScreen(
 
         Box(
             modifier = Modifier
-                .width(320.dp)
-                .height(90.dp)
+                .fillMaxWidth(0.75f)
+                .fillMaxHeight(0.1f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
                 .background(color = Color.White)
                 .constrainAs(box2) {
@@ -150,8 +164,8 @@ fun CrownsSettingsScreen(
 
         Box(
             modifier = Modifier
-                .width(320.dp)
-                .height(45.dp)
+                .fillMaxWidth(0.75f)
+                .fillMaxHeight(0.05f)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(12.dp))
                 .background(color = Color.White)
                 .constrainAs(box3) {
@@ -171,10 +185,10 @@ fun CrownsSettingsScreen(
 
         Box(
             modifier = Modifier
-                .width(290.dp)
+                .fillMaxWidth(0.7f)
                 .constrainAs(textExplain) {
                     absoluteLeft.linkTo(box3.absoluteLeft, margin = 15.dp)
-                    top.linkTo(box3.bottom, margin = 5.dp)
+                    top.linkTo(box3.bottom, margin = 10.dp)
                 }
         ) {
             Text(
@@ -193,8 +207,8 @@ fun CrownsSettingsScreen(
                 containerColor = colorResource(R.color.backgroundDark)
             ),
             modifier = Modifier
-                .width(120.dp)
-                .height(40.dp)
+                .fillMaxWidth(0.45f)
+                .height(55.dp)
                 .constrainAs(butHome) {
                     centerHorizontallyTo(parent)
                     bottom.linkTo(parent.bottom, margin = 40.dp)
@@ -207,14 +221,14 @@ fun CrownsSettingsScreen(
         ) {
             Text(
                 text = "Назад",
-                fontSize = 20.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }
 
         Box (
             modifier = Modifier
-                .width(290.dp)
+                .fillMaxWidth(0.7f)
                 .height(1.dp)
                 .alpha(0.35f)
                 .background(Color.Black)
@@ -225,7 +239,8 @@ fun CrownsSettingsScreen(
 
         Box (
             modifier = Modifier.constrainAs(textVolume) {
-                top.linkTo(box2.top, margin = 15.dp)
+                bottom.linkTo(innerLine.bottom)
+                top.linkTo(box2.top)
                 absoluteLeft.linkTo(box2.absoluteLeft, margin = 15.dp)
             }
         ) {
@@ -239,7 +254,8 @@ fun CrownsSettingsScreen(
 
         Box (
             modifier = Modifier.constrainAs(textTimer) {
-                bottom.linkTo(box2.bottom, margin = 15.dp)
+                bottom.linkTo(box2.bottom)
+                top.linkTo(innerLine.bottom)
                 absoluteLeft.linkTo(box2.absoluteLeft, margin = 15.dp)
             }
         ) {
@@ -265,6 +281,7 @@ fun CrownsSettingsScreen(
             ),
             modifier = Modifier.constrainAs(switch1) {
                 top.linkTo(box2.top)
+                bottom.linkTo(innerLine.top)
                 absoluteRight.linkTo(box2.absoluteRight, margin = 15.dp)
             }
         )
@@ -283,6 +300,7 @@ fun CrownsSettingsScreen(
             ),
             modifier = Modifier.constrainAs(switch2) {
                 bottom.linkTo(box2.bottom)
+                top.linkTo(innerLine.bottom)
                 absoluteRight.linkTo(box2.absoluteRight, margin = 15.dp)
             }
         )
